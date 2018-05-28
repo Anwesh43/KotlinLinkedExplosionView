@@ -152,10 +152,11 @@ class LinkedExplosionView (ctx : Context) : View(ctx) {
                     canvas.save()
                     canvas.translate(w/2, h/2)
                     canvas.rotate(60f * i)
-                    canvas.drawCircle(fl * size, 0f, size, paint)
+                    canvas.drawCircle(fl * size, 0f, r, paint)
                     canvas.restore()
                 }
             }
+            curr = LEBNode(cbs)
         }
 
         fun update(stopcb : (Float) -> Unit) {
