@@ -74,4 +74,49 @@ class LinkedExplosionView (ctx : Context) : View(ctx) {
             }
         }
     }
+
+    data class LEBNode (val cbs : ArrayList<(Canvas, Paint, Float) -> Unit>, val state : State = State()) {
+
+        var cb : (Canvas, Paint, Float) -> Unit = cbs[0]
+
+        var next : LEBNode? = null
+
+        var prev : LEBNode? = null
+
+        init {
+            cbs.removeAt(0)
+            if (cbs.size > 0) {
+                this.addNeighbor()
+            }
+        }
+
+        fun addNeighbor() {
+            next = LEBNode(cbs)
+            next?.prev = this
+        }
+
+        fun draw(canvas : Canvas, paint : Paint) {
+            cb.invoke(canvas, paint, state.scale)
+        }
+
+        fun update(stopcb : (Float) -> Unit) {
+            state.update(stopcb)
+        }
+
+        fun startUpdating(startcb : () -> Unit) {
+            state.startUpdating(startcb)
+        }
+
+        fun getNext(dir : Int, cb : () -> Unit) : LEBNode {
+            var curr : LEBNode? = prev
+            if (dir == 1) {
+                curr = next
+            }
+            if (curr != null) {
+                return curr
+            }
+            cb()
+            return this
+        }
+    }
 }
