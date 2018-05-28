@@ -174,4 +174,27 @@ class LinkedExplosionView (ctx : Context) : View(ctx) {
         }
 
     }
+
+    data class Renderer(var view : LinkedExplosionView) {
+
+        val animator : Animator = Animator(view)
+
+        val linkedExplosion : LinkedExplosion = LinkedExplosion(0)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(Color.parseColor("#212121"))
+            linkedExplosion.draw(canvas, paint)
+            animator.animate {
+                linkedExplosion.update {
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            linkedExplosion.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
