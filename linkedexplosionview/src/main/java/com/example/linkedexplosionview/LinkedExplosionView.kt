@@ -119,4 +119,59 @@ class LinkedExplosionView (ctx : Context) : View(ctx) {
             return this
         }
     }
+
+    data class LinkedExplosion(var i : Int) {
+
+        var dir : Int = 1
+
+        var curr : LEBNode? = null
+
+        init {
+            val cbs : ArrayList<(Canvas, Paint, Float) -> Unit> = ArrayList()
+            cbs.add {canvas, paint, fl ->
+                paint.alpha = 255
+                paint.color = Color.RED
+                val w : Float = canvas.width.toFloat()
+                val h : Float = canvas.height.toFloat()
+                val r : Float = Math.min(w, h) / 20
+                canvas.drawCircle(w - (w/2) * fl,(h/2) * fl, r, paint)
+            }
+            cbs.add { canvas, paint, fl ->
+                paint.alpha = 255
+                paint.color = Color.RED
+                val w : Float = canvas.width.toFloat()
+                val h : Float = canvas.height.toFloat()
+                val r : Float = Math.min(w, h) / 20
+                canvas.drawCircle(w/2, h/2, r * (1 - fl), paint)
+                val size : Float = Math.min(w, h) / 3
+                paint.alpha = (255 * (1 - fl)).toInt()
+                for (i in 1..6) {
+                    canvas.save()
+                    canvas.translate(w/2, h/2)
+                    canvas.rotate(60f * i)
+                    canvas.drawCircle(fl * size, 0f, size, paint)
+                    canvas.restore()
+                }
+            }
+        }
+
+        fun update(stopcb : (Float) -> Unit) {
+            curr?.update {scale ->
+                curr = curr?.getNext(dir) {
+                    dir *= -1
+                    stopcb(scale)
+                }
+                stopcb(scale)
+            }
+        }
+
+        fun startUpdating(startcb : () -> Unit) {
+            curr?.startUpdating(startcb)
+        }
+
+        fun draw(canvas: Canvas, paint : Paint) {
+            curr?.draw(canvas, paint)
+        }
+
+    }
 }
